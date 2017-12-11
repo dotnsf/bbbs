@@ -1,0 +1,152 @@
+<html>
+<head>
+<meta charset="utf8"/>
+<title>BBBS</title>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.0.3.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+$(function(){
+  //. /queryThreads
+  $('#thread_list').html( '' );
+  $.ajax({
+    type: 'POST',
+    url: '/queryThreads',
+    data: { token: '<%= token %>' },
+    success: function(data){
+      var messages = JSON.parse( data );
+      //console.log( messages );
+
+      //. クライアントサイドでソート
+      for( var i = 0; i < messages.length - 1; i ++ ){
+        for( var j = i + 1; j < messages.length; j ++ ){
+          if( messages[i].created < messages[j].created ){
+            var tmp = messages[i];
+            messages[i] = messages[j];
+            messages[j] = tmp;
+          }
+        }
+      }
+
+      for( var i = 0; i < messages.length; i ++ ){
+        var message = messages[i];
+        var message_id = message.id;
+        var message_thread_id = message.thread_id;
+        var message_subject = message.subject;
+        var message_body = message.body;
+        var message_user_id = message.user_id;
+        var message_created = message.created;
+
+        var tr = '<tr id="' + message_id + '"><td>' + ( i + 1 )
+          + '</td><td>' + message_subject
+          + '</td><td id="num_' + message_id + '">??'
+          + '</td></tr>';
+        $('#thread_list').append( tr );
+
+
+        $.ajax({
+          type: 'POST',
+          url: '/queryByThreadId',
+          data: { token: '<%= token %>', thread_id: message_thread_id },
+          success: function(data1){
+            data1 = JSON.parse( data1 );
+            //console.log( data1 );
+
+            if( data1.length > 0 ){
+              var m0 = data1[0];
+              $('#num_' + m0.thread_id).html( '' + data1.length );
+
+              var div = '<div id="thread_' + m0.thread_id + '">'
+                + '<b>' + m0.subject + '</b><br/>'
+                + m0.body
+                + '<br/> ' + m0.user_id
+                + ' (' +  m0.created + ')'
+                + '<ul>';
+              for( var j = 1; j < data1.length; j ++ ){
+                var m = data1[j];
+                div += ( '<li>' + m.body + ' - ' + m.user_id + '(' + m.created + ')</li>' );
+              }
+              div += '</ul>';
+
+              div += ( '<form class="form" method="POST" action="./post">'
+                + '<input type="hidden" name="token" value="<%= token %>"/>'
+                + '<input type="hidden" name="subject" value=""/>'
+                + '<input type="hidden" name="thread_id" value="' + m0.thread_id + '"/>'
+                + '<textarea class="form-control clear" name="body" placeholder="body" required=""></textarea><br/>'
+                + '<button class="btn btn-lg btn-primary btn-block" type="submit">Reply</button>'
+                + '</form>' );
+
+              div += '</div>';
+              $('#threads').append( div );
+            }
+            
+
+          },
+          error: function( err ){
+            console.log( err );
+          }
+        });
+      }
+    },
+    error: function(){
+      console.log( 'error' );
+    }
+  });
+});
+
+function queryByThreadId( thread_id ){
+  //. /queryByThreadId
+  $.ajax({
+    type: 'POST',
+    url: '/queryByThreadId',
+    data: { thread_id: thread_id, token: '<%= token %>' },
+    success: function(data){
+      console.log( data );
+    },
+    error: function(){
+      console.log( 'error' );
+    }
+  });
+}
+</script>
+<style>
+html, body, {
+  background-color: #ddddff;
+  height: 100%;
+  margin: 0px;
+  padding: 0px
+}
+</style>
+</head>
+<body>
+<div class="container" style="padding:20px 0; font-size:8px;">
+ <table class="table">
+  <thead>
+   <tr><th>#</th><th>Subject</th></tr>
+  </thead>
+  <tbody id="thread_list">
+  </tbody>
+ </table>
+</div>
+
+<hr/>
+
+<div id="threads" class="container" style="padding:20px 0; font-size:8px;">
+</div>
+
+<hr/>
+
+<div class="container" style="padding:20px 0; font-size:8px;">
+ <div class="col-md-8">
+  <form class="form" method="POST" action="./post">
+   <input type="hidden" name="token" value="<%= token %>"/>
+   Subject: <input type="text" class="form-control clear" name="subject" placeholder="subject" required=""/><br/>
+   Body: <textarea class="form-control clear" name="body" placeholder="body" required=""></textarea><br/>
+   <button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>
+  </form>
+ </div>
+</div>
+
+</body>
+</html>
+
