@@ -38,9 +38,28 @@ const HyperledgerClient = function() {
     }else{
       if( db == null ){
         cloudant = cloudantlib( { account: settings.cloudant_username, password: settings.cloudant_password } );
-        db = cloudant.db.use( settings.cloudant_db );
+        cloudant.db.get( settings.cloudant_db, function( err, body ){
+          if( err ){
+            if( err.statusCode == 404 ){
+              cloudant.db.create( settings.cloudant_db, function( err, body ){
+                if( err ){
+                  db = null;
+                  rejected(err);
+                }else{
+                  db = cloudant.db.use( settings.cloudant_db );
+                  resolved();
+                }
+              });
+            }else{
+              db = null;
+              rejected(err);
+            }
+          }else{
+            db = cloudant.db.use( settings.cloudant_db );
+            resolved();
+          }
+        });
       }
-      resolved();
     }
   };
 

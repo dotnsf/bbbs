@@ -4,7 +4,15 @@ Blockchain-ed BBS
 
 ## Overview
 
-Good old days BBS with Blockchain technology.
+Good old days BBS with Blockchain technology. You need to setup and run both API and Web Application.
+
+## Files
+
+- api/ : API
+
+- web/ : BBS Web Application
+
+- README.md
 
 ## Licensing
 
