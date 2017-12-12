@@ -468,6 +468,20 @@ const HyperledgerClient = function() {
           messages.forEach(message => {
             result.push(serializer.toJSON(message));
           });
+
+          //. ソート
+          for( var i = 0; i < result.length - 1; i ++ ){
+            for( var j = i + 1; j < result.length; j ++ ){
+              var dti = new Date( result[i].created );
+              var dtj = new Date( result[j].created );
+              if( dti.getTime() > dtj.getTime() ){
+                var tmp = result[i];
+                result[i] = result[j];
+                result[j] = tmp;
+              }
+            }
+          }
+
           resolved(result);
         }).catch(error => {
           console.log('HyperLedgerClient.getMessagesByThreadId(): reject');
