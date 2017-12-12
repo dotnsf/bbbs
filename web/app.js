@@ -11,7 +11,7 @@ var express = require( 'express' ),
     session = require( 'express-session' ),
     app = express();
 var settings = require( './settings' );
-var appEnv = cfenv.getAppEnv();
+//var appEnv = cfenv.getAppEnv();
 
 var port = /*appEnv.port ||*/ 3000;
 
@@ -29,11 +29,6 @@ app.use( session({
   }
 }) );
 
-/*
-app.all( '/apidoc.html', basicAuth( function( user, pass ){
-  return ( user === settings.basic_username && pass === settings.basic_password );
-}));
-*/
 app.use( express.static( __dirname + '/public' ) );
 
 app.set( 'views', __dirname + '/public' );
@@ -63,7 +58,7 @@ app.get( '/login', function( req, res ){
 app.post( '/login', function( req, res ){
   var id = req.body.id;
   var password = req.body.password;
-  console.log( 'id=' + id + ',password=' + password);
+  //console.log( 'id=' + id + ',password=' + password);
 
   var options1 = {
     url: settings.api_url + '/login',
@@ -81,7 +76,7 @@ app.post( '/login', function( req, res ){
       console.log( err1 );
       res.redirect( '/login?message=' + err1.message );
     }else{
-      console.log( body1 );
+      //console.log( body1 );
       if( body1.status && body1.token ){
         req.session.token = body1.token;
       }

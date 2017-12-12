@@ -59,6 +59,8 @@ const HyperledgerClient = function() {
             resolved();
           }
         });
+      }else{
+        resolved();
       }
     }
   };
@@ -95,12 +97,26 @@ const HyperledgerClient = function() {
         transaction.created = ( user.created ? new Date( user.created ) : currentDate );
         transaction.loggedin = ( user.loggedin ? new Date( user.loggedin ) : oldDate );
 
-        db.insert( transaction, user.id, function( err, body, header ){
+        db.get( user.id, function( err, data ){
           if( err ){
-            rejected( err );
+            db.insert( transaction, user.id, function( err, body, header ){
+              if( err ){
+                rejected( err );
+              }else{
+                console.log('HyperLedgerClient.createUserTx(): reject');
+                resolved( body );
+              }
+            });
           }else{
-            console.log('HyperLedgerClient.createUserTx(): reject');
-            resolved( body );
+            transaction['_id'] = data['_id'];
+            transaction['_rev'] = data['_rev'];
+            db.insert( transaction, function( err, body ){
+              if( err ){
+                rejected(err);
+              }else{
+                resolved(body);
+              }
+            });
           }
         });
       }

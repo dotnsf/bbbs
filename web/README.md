@@ -16,7 +16,7 @@ Good old days BBS with Blockchain technology.
 
 Edit settings.js:
 
-`exports.api_url = 'http://localhost:6012/api';`
+`exports.api_url = 'http://localhost:6013/api';`
 
 
 ## Install

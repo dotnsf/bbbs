@@ -5,6 +5,8 @@
 <script type="text/javascript" src="//code.jquery.com/jquery-2.0.3.min.js"></script>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="//gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet"/>
+<script src="//gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 <script>
 $(function(){
   //. /queryThreads
@@ -68,7 +70,8 @@ $(function(){
               }
               div += '</ul>';
 
-              div += ( '<form class="form" method="POST" action="./post">'
+              div += ( '<input type="checkbox" id="check_' + m0.thread_id + '_form" data-toggle="toggle"/>'
+                + '<form id="' + m0.thread_id + '_form" style="display:none;" class="form" method="POST" action="./post">'
                 + '<input type="hidden" name="token" value="<%= token %>"/>'
                 + '<input type="hidden" name="subject" value=""/>'
                 + '<input type="hidden" name="thread_id" value="' + m0.thread_id + '"/>'
@@ -78,18 +81,37 @@ $(function(){
 
               div += '</div>';
               $('#threads').append( div );
+              $('#check_' + m0.thread_id + '_form').bootstrapToggle({on: 'Display', off: 'Hide'});
+              $('#check_' + m0.thread_id + '_form').change( function(){
+                var checked = $(this).prop( 'checked' );
+                if( checked ){
+                  $('#' + m0.thread_id + '_form').css( 'display', 'block' );
+                }else{
+                  $('#' + m0.thread_id + '_form').css( 'display', 'none' );
+                }
+              });
             }
-            
-
           },
           error: function( err ){
             console.log( err );
           }
         });
+
       }
     },
     error: function(){
       console.log( 'error' );
+    }
+  });
+
+
+  $('#check_newthread_form').bootstrapToggle({on: 'Display', off: 'Hide'});
+  $('#check_newthread_form').change( function(){
+    var checked = $(this).prop( 'checked' );
+    if( checked ){
+      $('#newthread_form').css( 'display', 'block' );
+    }else{
+      $('#newthread_form').css( 'display', 'none' );
     }
   });
 });
@@ -120,9 +142,9 @@ html, body, {
 </head>
 <body>
 <div class="container" style="padding:20px 0; font-size:8px;">
- <table class="table">
+ <table class="table table-bordered">
   <thead>
-   <tr><th>#</th><th>Subject</th></tr>
+   <tr><th>#</th><th>Subject</th><th>Num</th></tr>
   </thead>
   <tbody id="thread_list">
   </tbody>
@@ -137,8 +159,9 @@ html, body, {
 <hr/>
 
 <div class="container" style="padding:20px 0; font-size:8px;">
+ <input type="checkbox" id="check_newthread_form" checked data-toggle="toggle"/>
  <div class="col-md-8">
-  <form class="form" method="POST" action="./post">
+  <form id="newthread_form" class="form" method="POST" action="./post">
    <input type="hidden" name="token" value="<%= token %>"/>
    Subject: <input type="text" class="form-control clear" name="subject" placeholder="subject" required=""/><br/>
    Body: <textarea class="form-control clear" name="body" placeholder="body" required=""></textarea><br/>
