@@ -485,6 +485,20 @@ const HyperledgerClient = function() {
                 docs.push( body.rows[i].doc );
               }
             }
+
+            //. ソート
+            for( var i = 0; i < docs.length - 1; i ++ ){
+              for( var j = i + 1; j < docs.length; j ++ ){
+                var dti = new Date( docs[i].created );
+                var dtj = new Date( docs[j].created );
+                if( dti.getTime() > dtj.getTime() ){
+                  var tmp = docs[i];
+                  docs[i] = docs[j];
+                  docs[j] = tmp;
+                }
+              }
+            }
+
             resolved( docs );
           }
         });
