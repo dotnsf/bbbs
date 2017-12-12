@@ -14,7 +14,7 @@ $(function(){
   $.ajax({
     type: 'POST',
     url: '/queryThreads',
-    data: { token: '<%= token %>' },
+    data: {},
     success: function(data){
       var messages = JSON.parse( data );
       //console.log( messages );
@@ -49,7 +49,7 @@ $(function(){
         $.ajax({
           type: 'POST',
           url: '/queryByThreadId',
-          data: { token: '<%= token %>', thread_id: message_thread_id },
+          data: { thread_id: message_thread_id },
           success: function(data1){
             data1 = JSON.parse( data1 );
             //console.log( data1 );
@@ -72,7 +72,6 @@ $(function(){
 
               div += ( '<input type="checkbox" id="check_' + m0.thread_id + '_form" data-toggle="toggle"/>'
                 + '<form id="' + m0.thread_id + '_form" style="display:none;" class="form" method="POST" action="./post">'
-                + '<input type="hidden" name="token" value="<%= token %>"/>'
                 + '<input type="hidden" name="subject" value=""/>'
                 + '<input type="hidden" name="thread_id" value="' + m0.thread_id + '"/>'
                 + '<textarea class="form-control clear" name="body" placeholder="body" required=""></textarea><br/>'
@@ -121,7 +120,7 @@ function queryByThreadId( thread_id ){
   $.ajax({
     type: 'POST',
     url: '/queryByThreadId',
-    data: { thread_id: thread_id, token: '<%= token %>' },
+    data: { thread_id: thread_id },
     success: function(data){
       console.log( data );
     },
@@ -162,7 +161,6 @@ html, body, {
  <input type="checkbox" id="check_newthread_form" checked data-toggle="toggle"/>
  <div class="col-md-8">
   <form id="newthread_form" class="form" method="POST" action="./post">
-   <input type="hidden" name="token" value="<%= token %>"/>
    Subject: <input type="text" class="form-control clear" name="subject" placeholder="subject" required=""/><br/>
    Body: <textarea class="form-control clear" name="body" placeholder="body" required=""></textarea><br/>
    <button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>

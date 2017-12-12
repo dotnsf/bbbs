@@ -36,7 +36,7 @@ app.set( 'view engine', 'ejs' );
 
 app.get( '/', function( req, res ){
   if( req.session && req.session.token ){
-    res.render( 'index', { token: req.session.token } );
+    res.render( 'index', {} );
   }else{
     res.redirect( '/login' );
   }
@@ -87,7 +87,7 @@ app.post( '/login', function( req, res ){
 });
 
 app.post( '/post', function( req, res ){
-  var token = req.body.token;
+  var token = req.session.token; //req.body.token;
   var json1 = { token: token };
   if( req.body.subject ){ json1['subject'] = req.body.subject; }
   if( req.body.body ){ json1['body'] = req.body.body; }
@@ -112,7 +112,7 @@ app.post( '/post', function( req, res ){
 });
 
 app.post( '/queryThreads', function( req, res ){
-  var token = req.body.token;
+  var token = req.session.token; //req.body.token;
   var limit = ( req.body.limit ? req.body.limit : '' );
   var skip = ( req.body.skip ? req.body.skip : 0 );
 
@@ -142,7 +142,7 @@ app.post( '/queryThreads', function( req, res ){
 });
 
 app.post( '/queryByThreadId', function( req, res ){
-  var token = req.body.token;
+  var token = req.session.token; //req.body.token;
   var thread_id = ( req.body.thread_id ? req.body.thread_id : '' );
   var limit = ( req.body.limit ? req.body.limit : '' );
   var skip = ( req.body.skip ? req.body.skip : 0 );
