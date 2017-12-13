@@ -1,0 +1,353 @@
+swagger: '2.0'
+info:
+  description: Blockchain-ed BBS on Hyperledger Fabric API Document
+  version: 0.0.1
+  title: BBBS REST API
+host: '192.168.0.12:6013'
+basePath: /
+tags:
+  - name: user
+    description: アカウントに対する処理
+  - name: message
+    description: 投稿メッセージに対する処理
+schemes:
+  - http
+  - https
+paths:
+  /api/adminuser:
+    post:
+      tags:
+        - user
+      summary: 管理者ユーザー作成
+      description: 管理者ロールを持ったユーザー admin を作成します。ブロックチェーン環境構築直後に一回だけ実行します。
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/AdminUserRequest'
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: 作成済み
+        '500':
+          description: サーバーエラー
+  /api/login:
+    post:
+      tags:
+        - user
+      summary: ユーザー認証
+      description: ユーザーID、パスワードを用いて認証します。ここで取得されるtokenを他のAPIの認証に使用します
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/LoginRequest'
+      responses:
+        '200':
+          description: ログイン成功
+          schema:
+            $ref: '#/definitions/LoginResult'
+        '401':
+          description: ログインエラー
+  /api/users:
+    get:
+      tags:
+        - user
+      summary: ユーザー一覧取得
+      description: 登録済みのユーザーの一覧を取得する
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/UserRequest'
+      responses:
+        '200':
+          description: 取得成功
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserResult'
+        '401':
+          description: ログインエラー
+        '500':
+          description: 実行エラー
+  /api/user:
+    get:
+      tags:
+        - user
+      summary: ユーザー取得
+      description: 登録済みのユーザーを取得する
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/UserIdRequest'
+      responses:
+        '200':
+          description: 取得成功
+          schema:
+            $ref: '#/definitions/UserResult'
+        '401':
+          description: ログインエラー
+        '404':
+          description: 該当ユーザーが見つからない
+        '500':
+          description: 実行エラー
+    post:
+      tags:
+        - user
+      summary: ユーザー作成／更新
+      description: ユーザーを新規に作成（または更新）する
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/UserRequest'
+      responses:
+        '200':
+          description: 成功
+        '401':
+          description: 権限エラー
+        '500':
+          description: 実行エラー
+    delete:
+      tags:
+        - user
+      summary: ユーザー削除
+      description: ユーザーを削除する
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/UserIdRequest'
+      responses:
+        '200':
+          description: 成功
+        '401':
+          description: 権限エラー
+        '404':
+          description: 該当ユーザーが見つからない
+        '500':
+          description: 実行エラー
+  /api/message:
+    get:
+      tags:
+        - message
+      summary: ログ取得
+      description: 登録済みの投稿メッセージを取得する
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/MessageIdRequest'
+      responses:
+        '200':
+          description: 取得成功
+        '401':
+          description: ログインエラー
+        '404':
+          description: 該当データが見つからない
+        '500':
+          description: 実行エラー
+    post:
+      tags:
+        - message
+      summary: 投稿メッセージ作成
+      description: 投稿メッセージを新規に作成する
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/MessageRequest'
+      responses:
+        '200':
+          description: 成功
+        '401':
+          description: 権限エラー
+        '500':
+          description: 実行エラー
+  /api/queryByThreadId:
+    post:
+      tags:
+        - message
+      summary: スレッドID検索
+      description: スレッドIDに合致するメッセージ一覧を取り出す
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/QueryByThreadIdRequest'
+      responses:
+        '200':
+          description: 成功
+        '401':
+          description: 権限エラー
+        '403':
+          description: 検索失敗
+        '500':
+          description: 実行エラー
+  /api/queryThreads:
+    post:
+      tags:
+        - message
+      summary: スレッド一覧
+      description: スレッド一覧を取り出す
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/QueryRequest'
+      responses:
+        '200':
+          description: 成功
+        '401':
+          description: 権限エラー
+        '403':
+          description: 検索失敗
+        '500':
+          description: 実行エラー
+definitions:
+  AdminUserRequest:
+    type: object
+    properties:
+      password:
+        type: string
+        format: password
+  LoginRequest:
+    type: object
+    properties:
+      id:
+        type: string
+        format: string
+      password:
+        type: string
+        format: password
+  UserRequest:
+    type: object
+    properties:
+      token:
+        type: string
+        description: トークン文字列
+      id:
+        type: string
+        description: ユーザーID
+      password:
+        type: string
+        description: パスワード
+      name:
+        type: string
+        description: 名前
+  UserIdRequest:
+    type: object
+    properties:
+      token:
+        type: string
+        description: トークン文字列
+      id:
+        type: string
+        description: ユーザーID
+  MessageRequest:
+    type: object
+    properties:
+      token:
+        type: string
+        description: トークン文字列
+      thread_id:
+        type: string
+        description: スレッドID
+      subject:
+        type: string
+        description: メッセージタイトル（レスポンスには不要）
+      body:
+        type: string
+        description: メッセージ本文
+  MessageIdRequest:
+    type: object
+    properties:
+      token:
+        type: string
+        description: トークン文字列
+      id:
+        type: string
+        description: Unique ID
+  QueryRequest:
+    type: object
+    properties:
+      token:
+        type: string
+        description: トークン文字列
+      limit:
+        type: integer
+        description: 取り出す数
+      skip:
+        type: integer
+        description: オフセット
+  QueryByThreadIdRequest:
+    type: object
+    properties:
+      token:
+        type: string
+        description: トークン文字列
+      thread_id:
+        type: string
+        description: スレッドID
+      limit:
+        type: integer
+        description: 取り出す数
+      skip:
+        type: integer
+        description: オフセット
+  LoginResult:
+    type: object
+    properties:
+      status:
+        type: boolean
+        description: 'true: 成功、 false: 失敗'
+      token:
+        type: string
+        format: string
+        description: アクセストークン
+      message:
+        type: string
+        format: string
+        description: エラーメッセージ
+  UserResult:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ユーザーID
+      password:
+        type: string
+        description: パスワード
+      name:
+        type: string
+        description: 名前
+      created:
+        type: string
+        description: 作成日時
+      loggedin:
+        type: string
+        description: 最終ログイン日時
+
