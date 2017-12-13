@@ -79,9 +79,10 @@ app.post( '/login', function( req, res ){
       //console.log( body1 );
       if( body1.status && body1.token ){
         req.session.token = body1.token;
+        res.redirect( '/' );
+      }else{
+        res.redirect( '/login?message=' + body1.message );
       }
-
-      res.redirect( '/' );
     }
   });
 });
