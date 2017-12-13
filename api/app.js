@@ -22,38 +22,19 @@ const client = new HyperledgerClient();
 
 app.set( 'superSecret', settings.superSecret );
 
-var port = appEnv.port || 3000;
+var port = /*appEnv.port ||*/ 3001;
 
 app.use( bodyParser.urlencoded( { extended: true } ) );
 app.use( bodyParser.json() );
 
-/*
-app.all( '/apidoc.html', basicAuth( function( user, pass ){
-  return ( user === settings.basic_username && pass === settings.basic_password );
-}));
-*/
 app.use( express.static( __dirname + '/public' ) );
 
 app.get( '/', function( req, res ){
-  res.write( '/apidoc.html for API Document' );
+  res.write( 'OK' );
   res.end();
 });
 
 var apiRoutes = express.Router();
-
-/* for debug
-apiRoutes.get( '/queryThreads', function( req, res ){
-        var condition = {};
-        client.getAllThreads( condition, result => {
-          res.write( JSON.stringify( result, 2, null ) );
-          res.end();
-        }, error => {
-          res.status( 403 );
-          res.write( JSON.stringify( error, 2, null ) );
-          res.end();
-        });
-});
-*/
 
 apiRoutes.post( '/login', function( req, res ){
   var id = req.body.id;
